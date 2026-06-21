@@ -1,104 +1,122 @@
-# 🛡️ EchoGuard
+<div align="center">
 
-> **AI-powered deepfake audio detection platform — identify synthetic voices with military-grade precision.**
+# EchoGuard: Deepfake Audio Detection 🛡️🎙️
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Machine Learning](https://img.shields.io/badge/Machine_Learning-Wav2Vec2_Ensemble-orange?style=for-the-badge)](https://huggingface.co/)
+
+_An end-to-end machine learning platform to identify synthetic voices with military-grade precision._
+
+</div>
+
+---
+
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Machine Learning Pipeline](#-machine-learning-pipeline)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Acknowledgements](#-acknowledgements)
+
+---
+
+## 🎯 Overview
+
+EchoGuard is a powerful deepfake audio detection platform designed to protect against synthetic media. By combining state-of-the-art neural network ensembles with traditional digital signal processing (DSP) forensics, EchoGuard provides a highly accurate, independent, and explainable analysis of any uploaded audio file.
 
 ---
 
 ## ✨ Features
-- **Dual-Model Ensemble Detection**: Dynamically loads and runs multiple HuggingFace Wav2Vec2 models simultaneously (general and ElevenLabs-optimized), using a max-pooling strategy to maximize detection sensitivity.
-- **Independent DSP Forensics Engine**: Utilizes deterministic digital signal processing algorithms (via `librosa`) for granular analysis of pitch variance, pause ratios, and spectral banding. The forensic layer is mathematically independent from the neural network predictions.
+
+- **Real-Time Analysis**: Upload audio files (WAV, MP3, M4A/AAC) via drag-and-drop for instant evaluation in a beautiful, glassmorphic UI.
 - **Timeline Segment Analysis**: Audio is processed in exact 1-second chunks through the ML pipeline to produce a time-mapped visual timeline, pinpointing exactly where deepfake artifacts occur.
-- **Broad Format Support**: Analyzes multiple audio formats, including WAV, MP3, and M4A/AAC (powered by an embedded `ffmpeg` binary).
-- **Real-Time Analysis**: Upload audio files via drag & drop and receive instant deepfake detection results in a beautiful, glassmorphic UI.
+- **Forensics Dashboard**: View multi-metric confidence gauges with spectral, temporal, and consistency breakdowns.
+
+---
+
+## 🧠 Machine Learning Pipeline
+
+Our solution relies on a robust and highly scalable dual-layer architecture:
+
+### 1. Audio Preprocessing
+- Uploaded files are normalized and downsampled to 16kHz mono audio.
+- Mel Spectrograms and Waveforms are generated for visual timeline tracking.
+
+### 2. Dual-Model Ensemble Detection
+We dynamically load and execute multiple HuggingFace Wav2Vec2 models simultaneously to maximize detection sensitivity across different synthetic domains:
+- **General Deepfakes:** `garystafford/wav2vec2-deepfake-audio-detection`
+- **High-Fidelity TTS:** `bisher/wav2vec2-deepfake-audio-detection-elevenlabs`
+- **Strategy:** Max-pooling is applied across the models to output the highest AI probability, maximizing security.
+
+### 3. Independent DSP Forensics Engine
+To provide ground-truth evidence, a deterministic signal processing layer (via `librosa`) operates completely independently from the neural networks:
+- **Voice Naturalness:** Analyzes pitch variance (`librosa.yin`) and exact pause-to-speech ratios using RMS energy thresholds.
+- **Audio Quality:** Evaluates spectral centroids, spectral bandwidth, and zero-crossing rates.
+
+---
+
+## 📁 Project Structure
+
+```text
+EchoGuard/
+├── backend/                    # FastAPI Backend
+│   ├── app/                    # Core API, Models, and Services
+│   │   ├── services/           # ML Detector and Forensics Engines
+│   │   └── routers/            # API Endpoints
+│   └── requirements.txt        # Python dependencies
+├── frontend/                   # Next.js 15 Frontend
+│   ├── src/
+│   │   ├── app/                # React App Router pages
+│   │   └── components/         # Interactive UI components
+│   └── package.json            # Node.js dependencies
+├── docs/                       # Architecture diagrams and documentation
+├── .gitignore                  # Defines ignored files and directories
+└── README.md                   # Project documentation
+```
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v20+)
-- Python (3.11+)
 
-### Installation
-1. Clone the repository:
+- Python 3.11+
+- Node.js (v20+)
+
+### Installation & Setup
+
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/username/echoguard.git
-   ```
-2. Navigate to the directory:
-   ```bash
    cd echoguard
    ```
-3. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
-4. Install backend dependencies:
+
+2. **Setup the Backend:**
    ```bash
    cd backend
    pip install -r requirements.txt
+   cp .env.example .env
    ```
 
-### Environment Setup
-```bash
-# Frontend
-cp frontend/.env.example frontend/.env.local
+3. **Setup the Frontend:**
+   ```bash
+   cd ../frontend
+   npm install
+   cp .env.example .env.local
+   ```
 
-# Backend
-cp backend/.env.example backend/.env
-```
+4. **Execute the Application:**
+   - Start the backend API: `uvicorn app.main:app --reload --port 8000`
+   - Start the frontend UI (in a new terminal): `npm run dev`
+   - Access the application at `http://localhost:3000`.
 
-## 💻 Usage
+---
 
-```bash
-# Start backend
-cd backend
-uvicorn app.main:app --reload --port 8000
+## 🙏 Acknowledgements
 
-# Start frontend (in a new terminal)
-cd frontend
-npm run dev
-```
-
-The frontend will be available at `http://localhost:3000` and the backend API at `http://localhost:8000`.
-
-## 🏗️ Architecture
-
-EchoGuard utilizes a powerful dual-model ML ensemble in conjunction with traditional DSP techniques to evaluate deepfakes. See `docs/architecture.md` for detailed flowcharts and component breakdowns.
-
-```text
-Upload (WAV/MP3/M4A)
-↓
-Audio Preprocessing (Mono, 16kHz resample, normalization)
-↓
-Dual-Model Ensemble (Wav2Vec2 HuggingFace Models)
-↓
-Independent DSP Forensics Evaluation (Multi-window extraction)
-↓
-Prediction, Timeline & Metrics Calculation
-```
-
-## 📊 Model Evaluation
-EchoGuard employs an ensemble approach to maximize robustness across different synthetic generation methods.
-- **General Deepfakes:** `garystafford/wav2vec2-deepfake-audio-detection` (Strong performance on standard deepfake datasets).
-- **High-Fidelity TTS:** `bisher/wav2vec2-deepfake-audio-detection-elevenlabs` (Specifically tuned to catch advanced ElevenLabs generation).
-
-## ⚠️ Limitations
-- Sensitivity to dataset distribution shifts and reduced performance on completely unseen synthetic voice generators.
-- Results should be interpreted as probabilistic decision support, not definitive proof.
-
-## 🔮 Future Work
-- Explainable AI feature attribution maps.
-- Advanced speaker diarization for multi-speaker recordings.
-
-## 🛠️ Built With
-- [Next.js 15](https://nextjs.org/) — React framework with App Router
-- [FastAPI](https://fastapi.tiangolo.com/) — High-performance Python API framework
-- [Transformers](https://huggingface.co/docs/transformers/index) — HuggingFace Machine Learning library
-- [Librosa](https://librosa.org/) — Audio and music processing in Python
-- [imageio-ffmpeg](https://github.com/imageio/imageio-ffmpeg) — FFmpeg distribution for Python
-
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome!
-Feel free to check out the [issues page](https://github.com/username/echoguard/issues).
-
-## 📝 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **HuggingFace** for providing the foundational Wav2Vec2 transformer models.
+- **Librosa** for the open-source audio and music processing toolkit.
+- **FastAPI** and **Next.js** for the incredible developer experience.
