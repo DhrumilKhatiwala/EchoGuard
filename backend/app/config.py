@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     debug: bool = True
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "*"
     model_path: str = "../models/"
     model_name: str = "echoguard_v1"
 
