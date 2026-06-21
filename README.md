@@ -8,6 +8,12 @@
 
 _An end-to-end machine learning platform to identify synthetic voices with military-grade precision._
 
+<br />
+
+<img src="docs/demo.webp" width="100%" alt="EchoGuard Interactive Demo" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
+
+<br />
+
 </div>
 
 ---
