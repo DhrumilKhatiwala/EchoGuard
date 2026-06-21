@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - echoguard-network
+    volumes:
+      - ./frontend/src:/app/src
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/app:/app/app
+      - ./models:/app/models
+      - ./data:/app/data
+    networks:
+      - echoguard-network
+    restart: unless-stopped
+
+networks:
+  echoguard-network:
+    driver: bridge

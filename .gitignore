@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.venv/
+env/
+.env
+*.pyc
+
+# Node.js
+node_modules/
+.next/
+out/
+.npm
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Models (large files)
+models/*.pt
+models/*.pth
+models/*.h5
+models/*.onnx
+models/*.pkl
+!models/.gitkeep
+!models/README.md
+
+# Data
+data/*.wav
+data/*.mp3
+data/*.flac
+data/*.ogg
+data/*.csv
+!data/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+.nyc_output/
+htmlcov/
+.coverage
+
+data/
+
+benchmark_results.json
+generate_tts.py
+response.json
