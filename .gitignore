@@ -72,3 +72,6 @@ data/
 benchmark_results.json
 generate_tts.py
 response.json
+
+# Backend Cache
+backend/cache/
