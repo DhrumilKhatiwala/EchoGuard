@@ -1,0 +1,42 @@
+name: Deploy Backend to Hugging Face Spaces
+
+on:
+  # Run automatically when code is pushed to master/main
+  push:
+    branches:
+      - master
+      - main
+    # Only trigger if the backend code changes
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-hf.yml'
+  # Allow running manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Deploy clean state to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Create a temporary deployment directory
+          mkdir -p temp-deploy
+          
+          # Copy only the backend files (ignores root files and git history)
+          cp -a backend/. temp-deploy/
+          cd temp-deploy
+          
+          # Initialize a fresh git repository to avoid pushing the old .wav history
+          git init
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "Automated backend deployment from GitHub Actions"
+          
+          # Force push to the Hugging Face Space
+          git push https://Dhrumilo7:$HF_TOKEN@huggingface.co/spaces/Dhrumilo7/echoguard-api master:main --force
