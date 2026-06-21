@@ -204,7 +204,7 @@ export default function Home() {
                 {/* Left Column: Prediction, Timeline */}
                 <div className="lg:col-span-8 flex flex-col gap-6">
                   <PredictionCard result={result} visible={showResults} />
-                  <TimelineAnalysis segments={result.timelineSegments} durationSeconds={waveformData.duration} />
+                  <TimelineAnalysis segments={result.timelineSegments} durationSeconds={waveformData?.duration || 0} />
                 </div>
 
                 {/* Right Column: Forensics, Evidence */}
