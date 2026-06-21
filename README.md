@@ -5,12 +5,11 @@
 ---
 
 ## ✨ Features
-- **Dynamic Single-Model Selection**: Automatically loads the best-performing HuggingFace Wav2Vec2 model based on benchmark F1 scores and inference time to use in production.
-- **Advanced DSP Forensics**: Utilizes deterministic digital signal processing algorithms (via `librosa`) for granular analysis of pitch variance, temporal stability, and spectral banding.
+- **Dual-Model Ensemble Detection**: Dynamically loads and runs multiple HuggingFace Wav2Vec2 models simultaneously (general and ElevenLabs-optimized), using a max-pooling strategy to maximize detection sensitivity.
+- **Independent DSP Forensics Engine**: Utilizes deterministic digital signal processing algorithms (via `librosa`) for granular analysis of pitch variance, pause ratios, and spectral banding. The forensic layer is mathematically independent from the neural network predictions.
+- **Timeline Segment Analysis**: Audio is processed in exact 1-second chunks through the ML pipeline to produce a time-mapped visual timeline, pinpointing exactly where deepfake artifacts occur.
 - **Broad Format Support**: Analyzes multiple audio formats, including WAV, MP3, and M4A/AAC (powered by an embedded `ffmpeg` binary).
-- **Real-Time Analysis**: Upload audio files via drag & drop and receive instant deepfake detection results.
-- **Waveform & Timeline Visualization**: Interactive audio waveform viewer with segment-level AI analysis overlay.
-- **Confidence Scoring**: Multi-metric confidence gauge with spectral, temporal, and consistency breakdowns.
+- **Real-Time Analysis**: Upload audio files via drag & drop and receive instant deepfake detection results in a beautiful, glassmorphic UI.
 
 ## 🚀 Getting Started
 
@@ -63,41 +62,32 @@ The frontend will be available at `http://localhost:3000` and the backend API at
 
 ## 🏗️ Architecture
 
-EchoGuard utilizes a single, dynamically-loaded primary ML model in conjunction with traditional DSP techniques to evaluate deepfakes.
+EchoGuard utilizes a powerful dual-model ML ensemble in conjunction with traditional DSP techniques to evaluate deepfakes. See `docs/architecture.md` for detailed flowcharts and component breakdowns.
 
 ```text
 Upload (WAV/MP3/M4A)
 ↓
 Audio Preprocessing (Mono, 16kHz resample, normalization)
 ↓
-DeepFake Detector (Wav2Vec2 HuggingFace Model)
+Dual-Model Ensemble (Wav2Vec2 HuggingFace Models)
 ↓
-DSP Forensics Evaluation (librosa)
+Independent DSP Forensics Evaluation (Multi-window extraction)
 ↓
-Prediction & Metrics Calculation
+Prediction, Timeline & Metrics Calculation
 ```
 
 ## 📊 Model Evaluation
-EchoGuard was evaluated using both in-domain and out-of-domain datasets to assess real-world robustness.
-
-### In-Domain Evaluation
-- **Dataset:** Deepfake Audio Detection Dataset v4 (Gary Stafford)
-- **F1 Score:** 94.7%
-- **Interpretation:** The detector performs strongly when evaluated on audio generated from distributions similar to those seen during training.
-
-### Out-of-Domain Evaluation
-- **Dataset:** Hemg/Deepfakeaudio
-- **F1 Score:** 0.0%
-- **Interpretation:** The detector failed to generalize to this unseen dataset and defaulted to predicting the majority class, highlighting a fundamental challenge in cross-domain deepfake detection.
+EchoGuard employs an ensemble approach to maximize robustness across different synthetic generation methods.
+- **General Deepfakes:** `garystafford/wav2vec2-deepfake-audio-detection` (Strong performance on standard deepfake datasets).
+- **High-Fidelity TTS:** `bisher/wav2vec2-deepfake-audio-detection-elevenlabs` (Specifically tuned to catch advanced ElevenLabs generation).
 
 ## ⚠️ Limitations
-- Sensitivity to dataset distribution shifts and reduced performance on previously unseen synthetic voice generators.
+- Sensitivity to dataset distribution shifts and reduced performance on completely unseen synthetic voice generators.
 - Results should be interpreted as probabilistic decision support, not definitive proof.
 
 ## 🔮 Future Work
-- Multi-model ensemble detection (currently uses a single best model)
-- Cross-dataset benchmarking and domain adaptation
-- Explainable AI feature attribution
+- Explainable AI feature attribution maps.
+- Advanced speaker diarization for multi-speaker recordings.
 
 ## 🛠️ Built With
 - [Next.js 15](https://nextjs.org/) — React framework with App Router
