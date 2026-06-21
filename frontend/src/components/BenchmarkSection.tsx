@@ -26,7 +26,7 @@ export default function BenchmarkSection() {
         } else {
           setData(null);
         }
-      } catch (err) {
+      } catch {
         setData(null);
       } finally {
         setLoading(false);

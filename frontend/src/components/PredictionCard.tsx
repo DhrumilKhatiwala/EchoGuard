@@ -200,6 +200,7 @@ export default function PredictionCard({ result, visible = true }: PredictionCar
               className="w-full h-32 sm:h-40 rounded-xl overflow-hidden bg-surface-elevated border border-surface flex items-center justify-center group/spec relative"
               title="Brighter colors indicate stronger frequency components."
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={result.spectrogramImage} 
                 alt="Mel Spectrogram" 
