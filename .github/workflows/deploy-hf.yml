@@ -39,4 +39,4 @@ jobs:
           git commit -m "Automated backend deployment from GitHub Actions"
           
           # Force push to the Hugging Face Space
-          git push https://Dhrumilo7:$HF_TOKEN@huggingface.co/spaces/Dhrumilo7/echoguard-api master:main --force
+          git push https://Dhrumilo7:$HF_TOKEN@huggingface.co/spaces/Dhrumilo7/echoguard-api HEAD:main --force
