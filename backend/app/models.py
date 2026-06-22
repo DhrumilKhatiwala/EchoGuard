@@ -30,7 +30,7 @@ class AnalysisResponse(BaseModel):
     duration_seconds: float = Field(..., description="Audio duration in seconds")
     file_size_bytes: int = Field(..., description="File size in bytes")
     
-    # ML Preprocessing Data
+    # DL Preprocessing Data
     sample_rate: int = Field(..., description="Audio sample rate in Hz")
     channels: int = Field(..., description="Number of audio channels (1 for mono)")
     peak_amplitude: float = Field(..., description="Peak amplitude after normalization")

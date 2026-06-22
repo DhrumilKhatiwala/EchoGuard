@@ -51,7 +51,7 @@ export default function BenchmarkSection() {
   return (
     <section id="benchmark" className="max-w-4xl mx-auto px-5 sm:px-8 pb-16 -mt-8 relative z-10">
       <div className="glass-card p-5 sm:p-6 rounded-2xl border border-border/50 bg-background/40 backdrop-blur-md">
-        <h2 className="text-[1.05rem] font-medium text-foreground mb-6 flex items-center gap-2">
+        <h2 className="text-lg font-medium text-foreground mb-6 flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent">
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
@@ -71,7 +71,7 @@ export default function BenchmarkSection() {
                 <div key={modelName} className={`p-5 rounded-xl border transition-all duration-300 ${isWinner ? 'bg-primary-muted/10 border-primary/30 shadow-[0_0_15px_rgba(56,189,248,0.05)]' : 'bg-surface border-border/30 hover:border-border/60'}`}>
                   <h3 className="text-sm font-semibold mb-4 font-mono truncate flex items-center gap-2" title={modelName}>
                     <span className={isWinner ? 'text-primary' : 'text-text-secondary'}>{modelName.split('/').pop()}</span>
-                    {isWinner && <span className="px-2 py-0.5 rounded text-[0.65rem] bg-primary/20 text-primary tracking-widest uppercase">Production Model</span>}
+                    {isWinner && <span className="px-2 py-0.5 rounded text-xs bg-primary/20 text-primary tracking-widest uppercase">Production Model</span>}
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-x divide-border/30">
                     {[
@@ -84,7 +84,7 @@ export default function BenchmarkSection() {
                         <div className={`text-xl font-bold mb-1 font-mono ${isWinner ? 'text-accent text-glow-primary' : 'text-text-secondary'}`}>
                           {typeof metric.value === 'number' ? `${(metric.value * 100).toFixed(1)}%` : metric.value}
                         </div>
-                        <div className="text-[0.65rem] text-text-muted uppercase tracking-[0.15em] font-medium">
+                        <div className="text-xs text-text-muted uppercase tracking-[0.15em] font-medium">
                           {metric.label}
                         </div>
                       </div>

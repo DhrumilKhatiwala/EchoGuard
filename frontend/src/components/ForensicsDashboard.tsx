@@ -23,7 +23,7 @@ export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps)
         </div>
         
         <div 
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-border/60 text-[0.65rem] font-medium text-text-secondary cursor-help transition-colors hover:border-primary/50"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-border/60 text-xs font-medium text-text-secondary cursor-help transition-colors hover:border-primary/50"
           title="These metrics are generated from signal-processing analysis and are independent of the deepfake detector's prediction."
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/70">

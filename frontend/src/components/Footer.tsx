@@ -3,37 +3,31 @@ export default function Footer() {
     <footer id="footer" className="border-t border-border mt-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
         
-        {/* Dataset & Model Compact Card */}
+        {/* Models Compact Card */}
         <div className="mb-12 p-5 rounded-2xl glass-card border border-border/50 flex flex-col md:flex-row items-center justify-between gap-6 max-w-4xl mx-auto bg-surface/30 backdrop-blur-md">
           <div className="flex flex-col gap-1 text-center md:text-left">
-            <h4 className="text-sm font-semibold text-foreground tracking-wide">Deepfake Audio Detection Dataset v4</h4>
-            <p className="text-sm text-text-muted">Model: Wav2Vec2 DeepFake Voice Detector</p>
+            <h4 className="text-sm font-semibold text-foreground tracking-wide">Ensemble Detection Architecture</h4>
+            <p className="text-sm text-text-muted">Powered by parallel Wav2Vec2 transformer networks</p>
           </div>
           
-          <div className="flex items-center gap-6 divide-x divide-border/50">
-            <div className="flex flex-col gap-0.5 px-4 text-center">
-              <span className="text-[1.05rem] font-bold text-accent font-mono">1,866</span>
-              <span className="text-xs text-text-muted uppercase tracking-wider">Samples</span>
-            </div>
-            <div className="flex flex-col gap-0.5 px-4 text-center">
-              <span className="text-base font-medium text-text-secondary mt-1">Human / Synthetic</span>
-              <span className="text-xs text-text-muted uppercase tracking-wider">Classes</span>
-            </div>
-          </div>
-          
-          <div>
+          <div className="flex items-center gap-2 sm:gap-6 divide-x divide-border/50">
             <a 
-              href="https://huggingface.co/datasets/garystafford/deepfake-audio-detection" 
+              href="https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector" 
               target="_blank" 
-              rel="noopener noreferrer" 
-              className="px-4 py-2 rounded-lg text-xs font-medium border border-border bg-surface hover:border-primary/50 text-text-secondary hover:text-primary transition-all duration-200 flex items-center gap-2 whitespace-nowrap"
+              rel="noopener noreferrer"
+              className="flex flex-col gap-1 px-4 text-center group transition-opacity"
             >
-              View Dataset
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
+              <span className="text-sm font-bold text-accent font-mono group-hover:underline">garystafford</span>
+              <span className="text-xs text-text-muted uppercase tracking-wider">Primary Model</span>
+            </a>
+            <a 
+              href="https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex flex-col gap-1 px-4 text-center group transition-opacity"
+            >
+              <span className="text-sm font-bold text-accent font-mono group-hover:underline">Bisher ASV</span>
+              <span className="text-xs text-text-muted uppercase tracking-wider">Secondary Model</span>
             </a>
           </div>
         </div>

@@ -218,7 +218,7 @@ export default function Home() {
             </div>
             
             {/* Disclaimer */}
-            <div className="mt-8 text-center text-[0.6875rem] text-text-muted/70 max-w-2xl mx-auto">
+            <div className="mt-8 text-center text-xs text-text-muted/70 max-w-2xl mx-auto">
               This analysis is probabilistic and should not be considered definitive proof of authenticity. 
               Results should be interpreted alongside other evidence.
             </div>

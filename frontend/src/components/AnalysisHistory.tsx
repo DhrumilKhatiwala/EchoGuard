@@ -68,7 +68,7 @@ export default function AnalysisHistory({ items }: AnalysisHistoryProps) {
             <span className="text-gradient-primary">Analysis</span>{" "}
             <span className="text-foreground">History</span>
           </h2>
-          <p className="text-text-secondary text-sm sm:text-[0.9375rem] font-light">
+          <p className="text-text-secondary text-sm sm:text-base font-light">
             Review past scans and track detection patterns over time.
           </p>
         </div>

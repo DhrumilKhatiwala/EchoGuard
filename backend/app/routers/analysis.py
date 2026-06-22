@@ -107,11 +107,11 @@ def _generate_prediction(
     forensics_data: dict,
     timeline_segments: list
 ) -> dict:
-    """Generate final response using the real ML detector results."""
+    """Generate final response using the real DL detector results."""
     
     explanation = "Analysis completed successfully."
     
-    # Merge ML prediction with preprocessing data
+    # Merge DL prediction with preprocessing data
     return {
         "id": analysis_id,
         "filename": filename,
@@ -155,7 +155,7 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
     if model_info.status != "ready":
         raise HTTPException(
             status_code=503, 
-            detail=f"ML model is not ready. Status: {model_info.status}"
+            detail=f"DL model is not ready. Status: {model_info.status}"
         )
         
     from app.utils.audio import AudioProcessor
@@ -174,7 +174,7 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
     file_size = len(content)
     _validate_file_size(file_size)
 
-    # Step 3: Write to temp file, validate, and execute ML preprocessing
+    # Step 3: Write to temp file, validate, and execute DL preprocessing
     ext = _get_file_extension(file.filename)
     tmp_path = None
     processed_data = None

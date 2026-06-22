@@ -5,7 +5,7 @@ class ForensicsAnalyzer:
     """
     Independent Audio Forensics Engine.
     Evaluates raw DSP features to compute Voice Naturalness and Audio Quality.
-    Does not rely on or mirror the ML deepfake predictions.
+    Does not rely on or mirror the DL deepfake predictions.
     """
 
     @staticmethod

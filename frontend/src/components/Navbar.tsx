@@ -95,18 +95,18 @@ export default function Navbar() {
       }}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-[72px]">
+        <div className="relative flex items-center justify-between h-[72px]">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group" id="nav-logo">
             <EchoGuardLogo size={36} />
-            <span className="heading-md text-[1.15rem] tracking-tight">
+            <span className="heading-md text-lg tracking-tight">
               <span className="text-primary">Echo</span>
               <span className="text-foreground">Guard</span>
             </span>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -131,12 +131,6 @@ export default function Navbar() {
               <span className="mono-data tracking-wider uppercase">Online</span>
             </div>
 
-            <div className="w-px h-5 bg-border" />
-
-            {/* CTA Button */}
-            <a href="#upload" id="nav-cta" className="btn-primary text-base px-5 py-2.5">
-              Start Scan
-            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -178,15 +172,6 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="pt-1">
-            <a
-              href="#upload"
-              onClick={() => setMobileMenuOpen(false)}
-              className="btn-primary w-full text-sm py-3"
-            >
-              Start Scan
-            </a>
-          </div>
         </div>
       </div>
     </nav>

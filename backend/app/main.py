@@ -21,7 +21,7 @@ from app.state import model_info
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load ML models
+    # Load DL models
     model_info.status = "loading"
     
     try:
@@ -38,11 +38,11 @@ async def lifespan(app: FastAPI):
         model_info.bisher_model = AutoModelForAudioClassification.from_pretrained(model_name_bisher)
 
         model_info.status = "ready"
-        logger.info("Loaded both ML models for ensemble detection.")
+        logger.info("Loaded both DL models for ensemble detection.")
     except Exception as e:
         model_info.status = "failed"
         model_info.error = str(e)
-        logger.error(f"Failed to load ML models: {e}")
+        logger.error(f"Failed to load DL models: {e}")
         
     yield
     

@@ -1,12 +1,12 @@
 <div align="center">
 
-# EchoGuard: Deepfake Audio Detection 🛡️🎙️
+# EchoGuard: Deepfake Audio Detection
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Machine Learning](https://img.shields.io/badge/Machine_Learning-Wav2Vec2_Ensemble-orange?style=for-the-badge)](https://huggingface.co/)
+[![Deep Learning](https://img.shields.io/badge/Deep_Learning-Wav2Vec2_Ensemble-orange?style=for-the-badge)](https://huggingface.co/)
 
-_An end-to-end machine learning platform to identify synthetic voices with military-grade precision._
+_An end-to-end deep learning platform to identify synthetic voices with high precision._
 
 <br />
 
@@ -18,24 +18,24 @@ _An end-to-end machine learning platform to identify synthetic voices with milit
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 - [Overview](#-overview)
 - [Features](#-features)
-- [Machine Learning Pipeline](#-machine-learning-pipeline)
+- [System Architecture](#system-architecture)
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Acknowledgements](#-acknowledgements)
 
 ---
 
-## 🎯 Overview
+## Overview
 
 EchoGuard is a powerful deepfake audio detection platform designed to protect against synthetic media. By combining state-of-the-art neural network ensembles with traditional digital signal processing (DSP) forensics, EchoGuard provides a highly accurate, independent, and explainable analysis of any uploaded audio file.
 
 ---
 
-## ✨ Features
+## Features
 
 - **Real-Time Analysis**: Upload audio files (WAV, MP3, M4A/AAC) via drag-and-drop for instant evaluation in a beautiful, glassmorphic UI.
 - **Timeline Segment Analysis**: Audio is processed in exact 1-second chunks through the ML pipeline to produce a time-mapped visual timeline, pinpointing exactly where deepfake artifacts occur.
@@ -43,28 +43,94 @@ EchoGuard is a powerful deepfake audio detection platform designed to protect ag
 
 ---
 
-## 🧠 Machine Learning Pipeline
+## System Architecture
 
-Our solution relies on a robust and highly scalable dual-layer architecture:
+### System Overview
 
-### 1. Audio Preprocessing
-- Uploaded files are normalized and downsampled to 16kHz mono audio.
-- Mel Spectrograms and Waveforms are generated for visual timeline tracking.
+```mermaid
+graph TB
+    subgraph Frontend["Frontend (Next.js 15)"]
+        UI[Web Interface]
+        Upload[Audio Uploader]
+        Viz[Waveform Viewer]
+        Results[Prediction Dashboard]
+        ForensicsUI[Forensics Dashboard]
+    end
 
-### 2. Dual-Model Ensemble Detection
-We dynamically load and execute multiple HuggingFace Wav2Vec2 models simultaneously to maximize detection sensitivity across different synthetic domains:
-- **General Deepfakes:** `garystafford/wav2vec2-deepfake-audio-detection`
-- **High-Fidelity TTS:** `bisher/wav2vec2-deepfake-audio-detection-elevenlabs`
-- **Strategy:** Max-pooling is applied across the models to output the highest AI probability, maximizing security.
+    subgraph Backend["Backend (FastAPI)"]
+        API[REST API]
+        Processor[Audio Processor]
+        Analyzer[Ensemble Detector]
+        Forensics[DSP Forensics Engine]
+    end
 
-### 3. Independent DSP Forensics Engine
-To provide ground-truth evidence, a deterministic signal processing layer (via `librosa`) operates completely independently from the neural networks:
-- **Voice Naturalness:** Analyzes pitch variance (`librosa.yin`) and exact pause-to-speech ratios using RMS energy thresholds.
-- **Audio Quality:** Evaluates spectral centroids, spectral bandwidth, and zero-crossing rates.
+    subgraph DL["Deep Learning Pipeline"]
+        Model1[Wav2Vec2: garystafford]
+        Model2[Wav2Vec2: bisher]
+    end
+
+    subgraph Storage["Storage"]
+        Cache[Local Audio Cache]
+        History[In-Memory Session]
+    end
+
+    UI --> Upload
+    Upload --> API
+    API --> Processor
+    Processor --> Analyzer
+    Processor --> Forensics
+    Analyzer --> Model1
+    Analyzer --> Model2
+    Model1 --> API
+    Model2 --> API
+    Forensics --> API
+    API --> History
+    Processor --> Cache
+    API --> Results
+    API --> ForensicsUI
+```
+
+### Component Descriptions
+
+#### Frontend
+- **Framework**: Next.js 15 with Turbopack (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom glassmorphic cybersecurity design system
+- **Key Components**: `AudioUploader`, `WaveformViewer`, `PredictionCard`, `TimelineAnalysis`, `ForensicsDashboard`, `EvidenceSummary`
+
+#### Backend
+- **Framework**: FastAPI
+- **Language**: Python 3.11
+- **API**: RESTful architecture
+- **Core Endpoints**: `/api/health`, `/api/analyze`
+
+#### Deep Learning Pipeline (Deepfake Detection)
+- **Architecture**: Dual-Model Ensemble
+- **Models**:
+  1. [garystafford/wav2vec2-deepfake-voice-detector](https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector) (General Deepfake detection)
+  2. [Bisher/wav2vec2_ASV_deepfake_audio_detection](https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection) (High-Fidelity TTS detection)
+- **Strategy**: Max-pooling. The system takes the highest AI probability between the two models to maximize detection sensitivity.
+- **Timeline Analysis**: The audio is processed in 1-second chunks through the ensemble to produce a time-mapped array of predictions, allowing the UI to pinpoint exactly where the deepfake artifacts occur.
+
+#### Audio Forensics Engine (DSP)
+- **Independence**: The forensic layer operates completely independently from the DL pipeline. It relies strictly on mathematical signal processing to ensure ground-truth evidence.
+- **Metrics**: 
+  - **Voice Naturalness**: Computed via pitch standard deviation (`librosa.yin`) on voiced frames and pause ratios (RMS energy thresholding).
+  - **Audio Quality**: Computed via spectral centroids, spectral bandwidth, and square-root normalized variance of zero-crossing rates.
+- **Multi-Window Analysis**: For files longer than 15 seconds, the engine extracts three discrete 5-second windows (Start, Middle, End) to calculate representative averages, preventing musical intros from corrupting the metrics.
+
+### Data Flow
+1. User uploads an audio file via the frontend.
+2. The file is sent to the FastAPI `/api/analyze` endpoint.
+3. **Preprocessing**: The file is downsampled to 16kHz mono and cached. Mel Spectrograms and Waveforms are generated.
+4. **Deepfake Detection**: The audio is split into 1-second batches and passed through the dual `Wav2Vec2` ensemble.
+5. **DSP Forensics**: The independent `ForensicsAnalyzer` evaluates the raw waveform to extract voice naturalness, audio quality, and evidence characteristics.
+6. The combined payload (Detection Verdict, Timeline Segments, Forensic Evidence) is returned to the frontend.
+7. The UI updates the Prediction Dashboard, Timeline Viewer, and Forensics Dashboard simultaneously.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 EchoGuard/
@@ -85,7 +151,7 @@ EchoGuard/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -121,7 +187,7 @@ EchoGuard/
 
 ---
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 - **HuggingFace** for providing the foundational Wav2Vec2 transformer models.
 - **Librosa** for the open-source audio and music processing toolkit.

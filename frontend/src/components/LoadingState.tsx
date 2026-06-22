@@ -8,7 +8,7 @@ interface LoadingStateProps {
 }
 
 const steps = [
-  { label: "Uploading", icon: "↑" },
+  { label: "Initializing Analysis", icon: "⟳" },
   { label: "Extracting Features", icon: "◎" },
   { label: "Analyzing Patterns", icon: "◇" },
   { label: "Generating Report", icon: "◈" },

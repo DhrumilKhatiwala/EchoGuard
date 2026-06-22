@@ -61,12 +61,40 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
   );
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       const error = validateFile(file);
       if (error) {
         setState({ status: "error", progress: 0, file: null, error });
         return;
       }
+
+      // Check audio duration
+      const durationError = await new Promise<string | null>((resolve) => {
+        const audio = new Audio();
+        const objectUrl = URL.createObjectURL(file);
+        
+        audio.addEventListener('loadedmetadata', () => {
+          URL.revokeObjectURL(objectUrl);
+          if (audio.duration < 0.05) {
+            resolve("Audio file is too short. Minimum duration is 0.05 seconds.");
+          } else {
+            resolve(null);
+          }
+        });
+        
+        audio.addEventListener('error', () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve("Could not read audio file duration. Please try another file.");
+        });
+        
+        audio.src = objectUrl;
+      });
+
+      if (durationError) {
+        setState({ status: "error", progress: 0, file: null, error: durationError });
+        return;
+      }
+
       simulateUpload(file);
     },
     [simulateUpload]
@@ -117,7 +145,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             <span className="text-gradient-primary">Upload</span>{" "}
             <span className="text-foreground">Audio File</span>
           </h2>
-          <p className="text-text-secondary text-sm sm:text-[0.9375rem] font-light">
+          <p className="text-text-secondary text-sm sm:text-base font-light">
             Drag and drop your audio file or click to browse. Supports WAV, MP3, FLAC, OGG, and M4A formats.
           </p>
         </div>
@@ -168,7 +196,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
                   </svg>
                 </div>
                 <div>
-                  <p className="text-foreground font-medium text-[0.9375rem] mb-1">
+                  <p className="text-foreground font-medium text-base mb-1">
                     {isDragging ? "Release to upload" : "Drag & drop audio file here"}
                   </p>
                   <p className="text-text-muted text-sm">
@@ -245,7 +273,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
                   </svg>
                 </div>
                 <div>
-                  <p className="text-accent font-medium text-sm">Analysis Complete</p>
+                  <p className="text-accent font-medium text-sm">Upload Complete</p>
                   <p className="text-text-muted text-sm mt-0.5">{state.file?.name}</p>
                 </div>
                 <button
