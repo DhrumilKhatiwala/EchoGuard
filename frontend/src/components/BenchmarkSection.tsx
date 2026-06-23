@@ -65,7 +65,6 @@ export default function BenchmarkSection() {
         ) : (
           <div className="space-y-4">
             {Object.entries(data).map(([modelName, metrics]) => {
-              // Highlight the winning model
               const isWinner = modelName === "garystafford/wav2vec2-deepfake-voice-detector";
               return (
                 <div key={modelName} className={`p-5 rounded-xl border transition-all duration-300 ${isWinner ? 'bg-primary-muted/10 border-primary/30 shadow-[0_0_15px_rgba(56,189,248,0.05)]' : 'bg-surface border-border/30 hover:border-border/60'}`}>

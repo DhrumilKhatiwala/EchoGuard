@@ -14,25 +14,21 @@ from app.routers import analysis, stats
 
 logger = logging.getLogger(__name__)
 
-# Track startup time for uptime reporting
 _startup_time = time.time()
 
 from app.state import model_info
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load DL models
     model_info.status = "loading"
     
     try:
         from transformers import AutoModelForAudioClassification, AutoFeatureExtractor
         
-        # 1. Load Garystafford model
         model_name_gary = "garystafford/wav2vec2-deepfake-voice-detector"
         model_info.gary_feature_extractor = AutoFeatureExtractor.from_pretrained(model_name_gary)
         model_info.gary_model = AutoModelForAudioClassification.from_pretrained(model_name_gary)
         
-        # 2. Load Bisher model
         model_name_bisher = "Bisher/wav2vec2_ASV_deepfake_audio_detection"
         model_info.bisher_feature_extractor = AutoFeatureExtractor.from_pretrained(model_name_bisher)
         model_info.bisher_model = AutoModelForAudioClassification.from_pretrained(model_name_bisher)
@@ -46,7 +42,6 @@ async def lifespan(app: FastAPI):
         
     yield
     
-    # Cleanup
     model_info.gary_feature_extractor = None
     model_info.gary_model = None
     model_info.bisher_feature_extractor = None
@@ -66,7 +61,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ---------- CORS ----------
 origins = [origin.strip() for origin in settings.cors_origins.split(",")]
 
 app.add_middleware(
@@ -78,7 +72,6 @@ app.add_middleware(
 )
 
 
-# ---------- GLOBAL ERROR HANDLERS ----------
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -111,13 +104,28 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-# ---------- ROUTERS ----------
 
 app.include_router(analysis.router, prefix="/api")
 app.include_router(stats.router, prefix="/api")
 
-
-# ---------- HEALTH ----------
+@app.get(
+    "/",
+    summary="API Root",
+    description="Returns basic information about the EchoGuard API.",
+    tags=["System"],
+)
+async def root():
+    """Root endpoint providing basic API information."""
+    return {
+        "name": "EchoGuard Deepfake Detection API",
+        "version": "0.1.0",
+        "status": "online",
+        "documentation": "/api/docs",
+        "endpoints": {
+            "health_check": "/api/health",
+            "analyze_audio": "/api/analyze"
+        }
+    }
 
 @app.get(
     "/api/health",

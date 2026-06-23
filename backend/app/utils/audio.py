@@ -94,15 +94,28 @@ class AudioProcessor:
         # Convert power spectrogram to dB (log scale)
         S_dB = librosa.power_to_db(S, ref=np.max)
 
-        # Render image
+        # Render image with dark mode styling
         fig, ax = plt.subplots(figsize=(10, 4))
-        ax.axis('off')
-        # Display the spectrogram without axes/borders
+        
+        # Display the spectrogram
         img = librosa.display.specshow(S_dB, sr=self.target_sr, x_axis='time', y_axis='mel', fmax=8000, ax=ax, cmap='magma')
+        
+        # Add labels and style axes for dark UI
+        ax.set_ylabel('Frequency (Hz)', color='#9ca3af', fontsize=10, labelpad=8)
+        ax.set_xlabel('Time (s)', color='#9ca3af', fontsize=10, labelpad=8)
+        
+        # Style the ticks
+        ax.tick_params(colors='#9ca3af', labelsize=9)
+        
+        # Remove top and right spines for a cleaner look
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['bottom'].set_color('#4b5563')
+        ax.spines['left'].set_color('#4b5563')
         
         # Save to buffer
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0, transparent=True)
+        plt.savefig(buf, format='png', bbox_inches='tight', transparent=True, dpi=120)
         plt.close(fig)
         
         # Encode to Base64

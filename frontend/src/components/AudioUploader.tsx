@@ -68,7 +68,6 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
         return;
       }
 
-      // Check audio duration
       const durationError = await new Promise<string | null>((resolve) => {
         const audio = new Audio();
         const objectUrl = URL.createObjectURL(file);
@@ -99,6 +98,21 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
     },
     [simulateUpload]
   );
+
+  const handleSampleClick = async (e: React.MouseEvent, type: 'real' | 'fake') => {
+    e.stopPropagation();
+    const filePath = type === 'real' ? '/samples/real-voice.wav' : '/samples/ai-voice.wav';
+    const fileName = type === 'real' ? 'real-voice.wav' : 'ai-voice.wav';
+    
+    try {
+      const response = await fetch(filePath);
+      const blob = await response.blob();
+      const file = new File([blob], fileName, { type: 'audio/wav' });
+      handleFile(file);
+    } catch (err) {
+      setState({ status: "error", progress: 0, file: null, error: "Failed to load sample audio." });
+    }
+  };
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -311,6 +325,38 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
                 </button>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Try it Out Section */}
+        <div className="mt-8 pt-8 border-t border-border/50 text-center">
+          <p className="text-text-secondary text-sm font-medium mb-4">Or try a pre-loaded sample:</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={(e) => handleSampleClick(e, 'real')}
+              className="btn-secondary text-sm px-6 py-2 w-full sm:w-auto flex items-center justify-center gap-2"
+              disabled={state.status === "uploading" || state.status === "processing"}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+              Try a Real Voice
+            </button>
+            <button
+              onClick={(e) => handleSampleClick(e, 'fake')}
+              className="btn-secondary text-sm px-6 py-2 w-full sm:w-auto flex items-center justify-center gap-2"
+              disabled={state.status === "uploading" || state.status === "processing"}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-danger">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+                <path d="M2 2l20 20" className="opacity-50"></path>
+              </svg>
+              Try an AI Deepfake
+            </button>
           </div>
         </div>
       </div>

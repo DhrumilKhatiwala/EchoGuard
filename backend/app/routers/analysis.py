@@ -27,7 +27,6 @@ from app.exceptions import (
 
 router = APIRouter(tags=["Analysis"])
 
-# Allowed audio MIME types and extensions
 ALLOWED_EXTENSIONS = {".wav", ".mp3", ".m4a"}
 ALLOWED_CONTENT_TYPES = {
     "audio/wav",
@@ -111,7 +110,6 @@ def _generate_prediction(
     
     explanation = "Analysis completed successfully."
     
-    # Merge DL prediction with preprocessing data
     return {
         "id": analysis_id,
         "filename": filename,
@@ -162,10 +160,8 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
 
     analysis_id = str(uuid.uuid4())
 
-    # Step 1: Validate file type by extension
     _validate_file_type(file.filename, file.content_type)
 
-    # Step 2: Read file content and validate size
     try:
         content = await file.read()
     except Exception:
@@ -174,7 +170,6 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
     file_size = len(content)
     _validate_file_size(file_size)
 
-    # Step 3: Write to temp file, validate, and execute DL preprocessing
     ext = _get_file_extension(file.filename)
     tmp_path = None
     processed_data = None
@@ -184,11 +179,9 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
             tmp.write(content)
             tmp_path = tmp.name
 
-        # Initial fast validation
         duration = _get_audio_duration(tmp_path, ext)
         _validate_duration(duration)
 
-        # Run real AI Preprocessing pipeline
         processor = AudioProcessor()
         cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "cache"))
         processed_data = processor.process(tmp_path, cache_dir, analysis_id)
@@ -201,7 +194,6 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
             error_msg = "The audio file format is not supported or the file is corrupted. (Missing decoding backend)"
         raise AudioProcessingError(reason=error_msg)
     finally:
-        # Clean up temp file
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.unlink(tmp_path)
@@ -211,9 +203,7 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
     if not processed_data:
         raise AudioProcessingError(reason="Failed to process audio features.")
 
-    # Step 4: Run Deepfake Detection
     try:
-        # Read the normalized, mono, 16kHz audio array from cache
         waveform, sr = sf.read(processed_data["processed_audio_path"], dtype="float32")
         
         from app.services.detector import EnsembleDetector
@@ -224,13 +214,10 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
         )
         detection_result = detector.analyze(waveform, sample_rate=sr)
         
-        # Timeline
         timeline_segments = detector.analyze_timeline(waveform, sample_rate=sr)
         
-        # Forensics
         forensics_data = ForensicsAnalyzer.analyze(waveform, sr, ai_probability=detection_result.ai_probability)
         
-        # Log metrics
         logger.info(
             f"Analysis complete - ID: {analysis_id} | "
             f"Duration: {processed_data['duration']:.2f}s | "
@@ -245,7 +232,6 @@ async def analyze_audio(file: UploadFile = File(..., description="Audio file (.w
         logger.error(f"Detection failed: {str(e)}")
         raise AudioProcessingError(reason=f"Model inference failed: {str(e)}")
 
-    # Step 5: Generate response
     result = _generate_prediction(
         analysis_id=analysis_id,
         filename=file.filename or "unknown",

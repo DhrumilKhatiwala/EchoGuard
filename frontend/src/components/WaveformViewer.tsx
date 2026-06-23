@@ -31,7 +31,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Decode real audio waveform when audioUrl changes
   useEffect(() => {
     if (!audioUrl) {
       setRealAmplitudes(data.amplitudes);
@@ -46,7 +45,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
         const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-        // Extract waveform amplitudes from the audio buffer
         const channelData = audioBuffer.getChannelData(0);
         const barCount = 100;
         const samplesPerBar = Math.floor(channelData.length / barCount);
@@ -57,7 +55,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
           let count = 0;
           const start = i * samplesPerBar;
           const end = Math.min(start + samplesPerBar, channelData.length);
-          // Sample a maximum of 200 points per bar to prevent main thread lockup on large files
           const step = Math.max(1, Math.floor((end - start) / 200)); 
           
           for (let j = start; j < end; j += step) {
@@ -66,11 +63,9 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
           }
           
           const avg = count > 0 ? sum / count : 0;
-          // Normalize: scale up so the waveform is visible
           amplitudes.push(Math.min(1, avg * 4));
         }
 
-        // Normalize to max
         const maxAmp = Math.max(...amplitudes, 0.01);
         const normalized = amplitudes.map(a => (a / maxAmp) * 0.9 + 0.1);
 
@@ -78,7 +73,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
         setDuration(audioBuffer.duration);
         audioContext.close();
       } catch {
-        // Fallback to mock data if decode fails
         setRealAmplitudes(data.amplitudes);
       }
     };
@@ -86,7 +80,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     decodeAudio();
   }, [audioUrl, data.amplitudes, data.duration]);
 
-  // Initialize / update audio element
   useEffect(() => {
     if (!audioUrl) {
       if (audioRef.current) {
@@ -96,12 +89,8 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
       return;
     }
 
-    // Only create a new Audio instance if the URL changed.
-    // We intentionally omit `volume` from dependencies to prevent resetting playback.
     const audio = new Audio(audioUrl);
     
-    // We use a setter to avoid stale closure issues if we need to access state,
-    // but initializing volume to current state is fine here.
     setVolume((currentVolume) => {
       audio.volume = currentVolume;
       return currentVolume;
@@ -128,7 +117,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     };
   }, [audioUrl]); // Removed `volume` to fix the reset bug
 
-  // Draw waveform
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -151,7 +139,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
 
     ctx.clearRect(0, 0, width, height);
 
-    // Create gradient once for the entire canvas height to prevent massive GC lag during drag
     const activeGradient = ctx.createLinearGradient(0, 0, 0, height);
     activeGradient.addColorStop(0, "#38bdf8");
     activeGradient.addColorStop(1, "#34d399");
@@ -172,7 +159,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
       ctx.fill();
     });
 
-    // Playhead
     if (playheadPosition > 0) {
       ctx.beginPath();
       ctx.moveTo(playheadPosition, 4);
@@ -186,7 +172,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     }
   }, [realAmplitudes, playheadPosition]);
 
-  // Sync playback with audio element or fallback to mock
   const tick = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -197,7 +182,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
       const dur = audioRef.current.duration || duration;
       const progress = Math.min(time / dur, 1);
       
-      // Only auto-update if we are NOT dragging the playhead manually
       if (!isDraggingRef.current) {
         setCurrentTime(time);
         setPlayheadPosition(progress * width);
@@ -209,7 +193,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     }
   }, [hasAudio, duration]);
 
-  // Play/pause handler
   const togglePlayback = useCallback(() => {
     if (hasAudio && audioRef.current) {
       if (isPlaying) {
@@ -221,17 +204,14 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
           setIsPlaying(true);
           animationRef.current = requestAnimationFrame(tick);
         }).catch(() => {
-          // Browser may block autoplay
           setIsPlaying(false);
         });
       }
     } else {
-      // Mock playback fallback (no real audio)
       setIsPlaying(!isPlaying);
     }
   }, [hasAudio, isPlaying, tick]);
 
-  // Mock playback simulation (when no real audio)
   useEffect(() => {
     if (hasAudio) return; // Real audio handles its own playback
     if (!isPlaying || isDragging) {
@@ -269,12 +249,10 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
   }, [isPlaying, duration, currentTime, hasAudio, isDragging]);
 
 
-  // Scrubbing Handlers
   const updatePlayhead = useCallback((e: React.MouseEvent<HTMLCanvasElement>, commitToAudio: boolean) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     
-    // Constrain x to canvas bounds
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     const progress = x / rect.width;
     setPlayheadPosition(x);
@@ -307,7 +285,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     }
   };
 
-  // Reset handler
   const handleReset = () => {
     setIsPlaying(false);
     setCurrentTime(0);
@@ -319,7 +296,6 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
   };
 
-  // Volume handler
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = parseFloat(e.target.value);
     setVolume(v);

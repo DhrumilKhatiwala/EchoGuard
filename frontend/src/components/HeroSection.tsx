@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 export default function HeroSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Animated particle network background
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -60,7 +59,6 @@ export default function HeroSection() {
         ctx.fill();
       });
 
-      // Draw connections
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;

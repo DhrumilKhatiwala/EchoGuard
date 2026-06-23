@@ -15,7 +15,6 @@ import EvidenceSummary from "@/components/EvidenceSummary";
 import TimelineAnalysis from "@/components/TimelineAnalysis";
 import { AnalysisResult, Verdict, WaveformData, ForensicMetrics, TimelineSegment, AnalysisHistoryItem } from "@/lib/types";
 
-// Maximum retries for the API call
 const MAX_RETRIES = 2;
 
 export default function Home() {
@@ -27,7 +26,6 @@ export default function Home() {
   const [history, setHistory] = useState<AnalysisHistoryItem[]>([]);
   const previousUrlRef = useRef<string | null>(null);
 
-  // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
       if (previousUrlRef.current) {
@@ -60,7 +58,6 @@ export default function Home() {
     } catch (error: unknown) {
       if (retryCount < MAX_RETRIES) {
         toast.info(`Connection issue. Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
-        // Wait 1.5 seconds before retrying
         await new Promise((resolve) => setTimeout(resolve, 1500));
         return uploadWithRetry(file, retryCount + 1);
       }
@@ -69,12 +66,10 @@ export default function Home() {
   };
 
   const handleUploadComplete = async (file: File) => {
-    // Revoke previous object URL to prevent memory leaks
     if (previousUrlRef.current) {
       URL.revokeObjectURL(previousUrlRef.current);
     }
 
-    // Create a playable URL from the uploaded file
     const url = URL.createObjectURL(file);
     previousUrlRef.current = url;
     setAudioUrl(url);
@@ -103,7 +98,6 @@ export default function Home() {
         timeline: TimelineSegment[];
       };
       
-      // Map backend "prediction" to frontend "verdict" type
       let mappedVerdict: Verdict = "suspicious";
       if (data.prediction === "LIKELY AI GENERATED" || data.prediction === "AI Generated") mappedVerdict = "deepfake";
       if (data.prediction === "LIKELY HUMAN" || data.prediction === "Human") mappedVerdict = "authentic";

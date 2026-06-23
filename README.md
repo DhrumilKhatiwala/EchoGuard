@@ -20,12 +20,12 @@ _An end-to-end deep learning platform to identify synthetic voices with high pre
 
 ## Table of Contents
 
-- [Overview](#-overview)
-- [Features](#-features)
+- [Overview](#overview)
+- [Features](#features)
 - [System Architecture](#system-architecture)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Acknowledgements](#-acknowledgements)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
@@ -38,8 +38,9 @@ EchoGuard is a powerful deepfake audio detection platform designed to protect ag
 ## Features
 
 - **Real-Time Analysis**: Upload audio files (WAV, MP3, M4A/AAC) via drag-and-drop for instant evaluation in a beautiful, glassmorphic UI.
-- **Timeline Segment Analysis**: Audio is processed in exact 1-second chunks through the ML pipeline to produce a time-mapped visual timeline, pinpointing exactly where deepfake artifacts occur.
-- **Forensics Dashboard**: View multi-metric confidence gauges with spectral, temporal, and consistency breakdowns.
+- **Interactive Demo Samples**: Instantly test the system using built-in authentic and AI-generated audio samples without needing to find your own files.
+- **Timeline Segment Analysis**: Audio is processed in exact 1-second chunks through the DL pipeline to produce a time-mapped visual timeline, pinpointing exactly where deepfake artifacts occur.
+- **Forensics Dashboard**: View multi-metric confidence gauges, along with a high-resolution, axes-labeled Mel-Spectrogram for deep visual frequency analysis.
 
 ---
 
@@ -49,29 +50,34 @@ EchoGuard is a powerful deepfake audio detection platform designed to protect ag
 
 ```mermaid
 graph TB
+    classDef frontend fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+    classDef backend fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef dl fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
+    classDef storage fill:#0f172a,stroke:#64748b,stroke-width:2px,color:#f8fafc;
+
     subgraph Frontend["Frontend (Next.js 15)"]
-        UI[Web Interface]
-        Upload[Audio Uploader]
-        Viz[Waveform Viewer]
-        Results[Prediction Dashboard]
-        ForensicsUI[Forensics Dashboard]
+        UI[Web Interface]:::frontend
+        Upload[Audio Uploader]:::frontend
+        Viz[Waveform Viewer]:::frontend
+        Results[Prediction Dashboard]:::frontend
+        ForensicsUI[Forensics Dashboard]:::frontend
     end
 
     subgraph Backend["Backend (FastAPI)"]
-        API[REST API]
-        Processor[Audio Processor]
-        Analyzer[Ensemble Detector]
-        Forensics[DSP Forensics Engine]
+        API[REST API]:::backend
+        Processor[Audio Processor]:::backend
+        Analyzer[Ensemble Detector]:::backend
+        Forensics[DSP Forensics Engine]:::backend
     end
 
     subgraph DL["Deep Learning Pipeline"]
-        Model1[Wav2Vec2: garystafford]
-        Model2[Wav2Vec2: bisher]
+        Model1[Wav2Vec2: garystafford]:::dl
+        Model2[Wav2Vec2: bisher]:::dl
     end
 
     subgraph Storage["Storage"]
-        Cache[Local Audio Cache]
-        History[In-Memory Session]
+        Cache[Local Audio Cache]:::storage
+        History[In-Memory Session]:::storage
     end
 
     UI --> Upload
@@ -90,43 +96,38 @@ graph TB
     API --> ForensicsUI
 ```
 
-### Component Descriptions
+### Technology Stack
 
-#### Frontend
-- **Framework**: Next.js 15 with Turbopack (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom glassmorphic cybersecurity design system
-- **Key Components**: `AudioUploader`, `WaveformViewer`, `PredictionCard`, `TimelineAnalysis`, `ForensicsDashboard`, `EvidenceSummary`
+| Layer | Framework/Language | Key Features & Components |
+| :--- | :--- | :--- |
+| **Frontend** | Next.js 15, TypeScript, Tailwind | Interactive glassmorphic UI, Audio Uploader, Waveform Canvas, Timeline Visualization |
+| **Backend** | FastAPI, Python 3.11 | High-performance REST architecture, in-memory caching, parallel processing |
 
-#### Backend
-- **Framework**: FastAPI
-- **Language**: Python 3.11
-- **API**: RESTful architecture
-- **Core Endpoints**: `/api/health`, `/api/analyze`
+### Deep Learning Pipeline (Deepfake Detection)
 
-#### Deep Learning Pipeline (Deepfake Detection)
-- **Architecture**: Dual-Model Ensemble
-- **Models**:
-  1. [garystafford/wav2vec2-deepfake-voice-detector](https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector) (General Deepfake detection)
-  2. [Bisher/wav2vec2_ASV_deepfake_audio_detection](https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection) (High-Fidelity TTS detection)
-- **Strategy**: Max-pooling. The system takes the highest AI probability between the two models to maximize detection sensitivity.
-- **Timeline Analysis**: The audio is processed in 1-second chunks through the ensemble to produce a time-mapped array of predictions, allowing the UI to pinpoint exactly where the deepfake artifacts occur.
+- **Architecture Strategy**: Dual-Model Ensemble Strategy utilizing Max-pooling to guarantee the highest detection sensitivity.
+- **Timeline Analysis**: Audio is processed in exact 1-second chunks through the ensemble to produce a visual, time-mapped array of deepfake artifacts.
 
-#### Audio Forensics Engine (DSP)
-- **Independence**: The forensic layer operates completely independently from the DL pipeline. It relies strictly on mathematical signal processing to ensure ground-truth evidence.
-- **Metrics**: 
-  - **Voice Naturalness**: Computed via pitch standard deviation (`librosa.yin`) on voiced frames and pause ratios (RMS energy thresholding).
-  - **Audio Quality**: Computed via spectral centroids, spectral bandwidth, and square-root normalized variance of zero-crossing rates.
-- **Multi-Window Analysis**: For files longer than 15 seconds, the engine extracts three discrete 5-second windows (Start, Middle, End) to calculate representative averages, preventing musical intros from corrupting the metrics.
+| Designation | Transformer Architecture | Primary Detection Domain |
+| :--- | :--- | :--- |
+| **Primary Model** | [garystafford/wav2vec2-deepfake-voice-detector](https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector) | General Synthetic Audio & AI Voice Clones |
+| **Secondary Model**| [Bisher/wav2vec2_ASV_deepfake_audio_detection](https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection) | High-Fidelity TTS Engines (e.g. ElevenLabs) |
+
+### Audio Forensics Engine (DSP)
+
+The forensic layer relies strictly on mathematical signal processing (via `librosa`) to ensure independent, ground-truth evidence completely isolated from the neural networks.
+
+- **Voice Naturalness**: Evaluates pitch standard deviation (`yin`) on voiced frames and pause-to-speech ratios via RMS energy thresholding.
+- **Audio Quality**: Computes spectral centroids, spectral bandwidth, and square-root normalized variance of zero-crossing rates.
+- **Multi-Window Analysis**: Automatically extracts distinct 5-second representative windows to prevent musical intros from corrupting the metrics.
 
 ### Data Flow
-1. User uploads an audio file via the frontend.
-2. The file is sent to the FastAPI `/api/analyze` endpoint.
-3. **Preprocessing**: The file is downsampled to 16kHz mono and cached. Mel Spectrograms and Waveforms are generated.
-4. **Deepfake Detection**: The audio is split into 1-second batches and passed through the dual `Wav2Vec2` ensemble.
-5. **DSP Forensics**: The independent `ForensicsAnalyzer` evaluates the raw waveform to extract voice naturalness, audio quality, and evidence characteristics.
-6. The combined payload (Detection Verdict, Timeline Segments, Forensic Evidence) is returned to the frontend.
-7. The UI updates the Prediction Dashboard, Timeline Viewer, and Forensics Dashboard simultaneously.
+
+1. **Upload**: User submits an audio file via the drag-and-drop web interface.
+2. **Pre-processing**: FastAPI downsamples the audio to `16kHz mono`, normalizes the amplitude, and renders Mel Spectrograms.
+3. **Execution**: The audio is batched into 1-second segments and passed simultaneously through the DL Ensemble and the independent DSP engine.
+4. **Synchronization**: The resulting combined payload (Detection Verdict, Timeline Array, Forensic Evidence) is generated and returned.
+5. **Visualization**: The UI instantly renders the Waveform, Timeline Analysis, and Confidence Dashboards.
 
 ---
 
@@ -136,7 +137,7 @@ graph TB
 EchoGuard/
 ├── backend/                    # FastAPI Backend
 │   ├── app/                    # Core API, Models, and Services
-│   │   ├── services/           # ML Detector and Forensics Engines
+│   │   ├── services/           # DL Detector and Forensics Engines
 │   │   └── routers/            # API Endpoints
 │   └── requirements.txt        # Python dependencies
 ├── frontend/                   # Next.js 15 Frontend
