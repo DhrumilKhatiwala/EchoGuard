@@ -169,11 +169,10 @@ export default function AnalysisHistory({ items }: AnalysisHistoryProps) {
                 </div>
 
                 {/* Expanded */}
-                <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
+                <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
                   <div className="px-5 pb-4 pt-0 border-t border-border">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                       {[
-                        { label: "Analysis ID", value: item.id },
                         { label: "Confidence", value: `${(item.confidence * 100).toFixed(1)}%`, highlight: true },
                         { label: "Duration", value: item.duration },
                         { label: "Date", value: new Date(item.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) },
