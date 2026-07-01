@@ -6,11 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Deep Learning](https://img.shields.io/badge/Deep_Learning-Wav2Vec2_Ensemble-orange?style=for-the-badge)](https://huggingface.co/)
 
-<<<<<<< HEAD
-_An advanced AI platform for detection of synthetic speech and voice cloning._
-=======
-_An end-to-end deep learning platform to identify synthetic AI generated voices._
->>>>>>> 03cbf9cb3280c30af3f18280c9e8d1bcb155df2a
+_An end-to-end deep learning platform to identify synthetic speech and voice cloning._
 
 <br />
 
