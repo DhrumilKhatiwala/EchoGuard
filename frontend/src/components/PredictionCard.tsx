@@ -126,7 +126,7 @@ export default function PredictionCard({ result, visible = true }: PredictionCar
   return (
     <div
       id="prediction-card"
-      className={`glass-card-elevated hover:-translate-y-1 group p-5 sm:p-6 transition-all duration-700 h-full ${
+      className={`glass-card-elevated group p-5 sm:p-6 transition-all duration-700 h-full ${
         show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >

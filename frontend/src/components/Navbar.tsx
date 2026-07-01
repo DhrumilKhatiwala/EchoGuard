@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function EchoGuardLogo({ size = 32 }: { size?: number }) {
   return (
@@ -63,6 +63,8 @@ function EchoGuardLogo({ size = 32 }: { size?: number }) {
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [apiStatus, setApiStatus] = useState<"online" | "waking" | "offline" | "checking">("checking");
+  const wakeStartTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -70,11 +72,130 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    let timer: NodeJS.Timeout;
+
+    const poll = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch(`${API_URL}/api/health`, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        clearTimeout(timeoutId);
+
+        if (!isMounted) return;
+
+        if (res.ok) {
+          setApiStatus("online");
+          wakeStartTimeRef.current = null;
+          timer = setTimeout(poll, 15000);
+        } else {
+          handleOfflineOrWaking();
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        handleOfflineOrWaking();
+      }
+    };
+
+    const handleOfflineOrWaking = () => {
+      if (wakeStartTimeRef.current === null) {
+        wakeStartTimeRef.current = Date.now();
+      }
+
+      const elapsedSeconds = (Date.now() - wakeStartTimeRef.current) / 1000;
+
+      if (elapsedSeconds <= 30) {
+        // For the first 30 seconds -> actively send requests every 3 seconds to wake up Hugging Face space!
+        setApiStatus("waking");
+        timer = setTimeout(poll, 3000);
+      } else if (elapsedSeconds <= 630) {
+        // After 30 seconds -> switch to OFFLINE, but keep sending requests every 60 seconds for up to 10 minutes!
+        setApiStatus("offline");
+        timer = setTimeout(poll, 60000);
+      } else {
+        // After 10 minutes -> remain offline and check every 5 minutes until online
+        setApiStatus("offline");
+        timer = setTimeout(poll, 300000);
+      }
+    };
+
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
   const navLinks = [
     { label: "Dashboard", href: "#hero" },
     { label: "Analyze", href: "#upload" },
     { label: "History", href: "#history" },
   ];
+
+  const getStatusBadge = (isMobile = false) => {
+    const isOnline = apiStatus === "online";
+    const isWaking = apiStatus === "waking";
+    const isOffline = apiStatus === "offline";
+
+    return (
+      <div
+        title={
+          isOnline
+            ? "Backend API is online and listening."
+            : isWaking
+            ? "Backend API is asleep on Hugging Face. Actively sending wake-up pings in the background before you upload..."
+            : isOffline
+            ? "Backend API is offline or asleep on Hugging Face. Automatically checking every 60 seconds."
+            : "Checking backend API status..."
+        }
+        className={`flex items-center gap-2 transition-all duration-300 ${
+          isMobile ? "text-xs py-1" : "text-xs sm:text-sm"
+        } ${
+          isOnline
+            ? "text-accent"
+            : isWaking
+            ? "text-cyan-400"
+            : isOffline
+            ? "text-red-400"
+            : "text-amber-400"
+        }`}
+      >
+        <span className="relative flex h-[6px] w-[6px]">
+          {isOnline ? (
+            <>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60" />
+              <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-accent" />
+            </>
+          ) : isWaking ? (
+            <>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-80" />
+              <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-cyan-400" />
+            </>
+          ) : isOffline ? (
+            <>
+              <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-red-400" />
+            </>
+          ) : (
+            <>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-amber-400" />
+            </>
+          )}
+        </span>
+        <span className="mono-data tracking-wider uppercase font-semibold">
+          {isOnline ? "Online" : isWaking ? (isMobile ? "Waking..." : "Waking Up...") : isOffline ? "Offline" : "Checking"}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <nav
@@ -121,22 +242,15 @@ export default function Navbar() {
           </div>
 
           {/* Status + CTA */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="flex items-center gap-3 sm:gap-5">
             {/* System Status */}
-            <div className="flex items-center gap-2 text-sm text-text-muted">
-              <span className="relative flex h-[6px] w-[6px]">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60" />
-                <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-accent" />
-              </span>
-              <span className="mono-data tracking-wider uppercase">Online</span>
-            </div>
-
+            {getStatusBadge(false)}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             id="mobile-menu-toggle"
-            className="md:hidden p-2 -mr-2 text-text-secondary hover:text-primary transition-colors"
+            className="md:hidden p-2 -mr-2 text-text-secondary hover:text-primary transition-colors ml-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -158,10 +272,10 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 overflow-hidden ${
-          mobileMenuOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0"
+          mobileMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="glass-card-elevated mx-4 mb-4 p-3 !rounded-xl space-y-1">
+        <div className="glass-card-elevated mx-4 mb-4 p-3 !rounded-xl space-y-2">
           {navLinks.map((link) => (
             <a
               key={link.label}
@@ -172,6 +286,10 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
+          <div className="pt-2 border-t border-primary/10 px-4 py-2 flex items-center justify-between">
+            <span className="text-xs text-text-muted font-medium">API Health</span>
+            {getStatusBadge(true)}
+          </div>
         </div>
       </div>
     </nav>

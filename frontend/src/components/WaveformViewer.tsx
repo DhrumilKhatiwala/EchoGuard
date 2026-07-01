@@ -22,6 +22,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const animationRef = useRef<number | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const hasAudio = !!audioUrl;
 
@@ -118,6 +119,17 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
   }, [audioUrl]); // Removed `volume` to fix the reset bug
 
   useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.getBoundingClientRect().width);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -170,7 +182,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
       ctx.stroke();
       ctx.shadowBlur = 0;
     }
-  }, [realAmplitudes, playheadPosition]);
+  }, [realAmplitudes, playheadPosition, containerWidth]);
 
   const tick = useCallback(() => {
     const container = containerRef.current;
@@ -285,6 +297,51 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
     }
   };
 
+  const updatePlayheadTouch = useCallback((e: React.TouchEvent<HTMLCanvasElement>, commitToAudio: boolean) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect || e.touches.length === 0) return;
+    const touch = e.touches[0];
+    const x = Math.max(0, Math.min(touch.clientX - rect.left, rect.width));
+    const progress = x / rect.width;
+    setPlayheadPosition(x);
+    const newTime = progress * duration;
+    setCurrentTime(newTime);
+    if (commitToAudio && hasAudio && audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  }, [duration, hasAudio]);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    setIsDragging(true);
+    isDraggingRef.current = true;
+    updatePlayheadTouch(e, true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (isDraggingRef.current) {
+      updatePlayheadTouch(e, false);
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (isDraggingRef.current) {
+      setIsDragging(false);
+      isDraggingRef.current = false;
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect && e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        const x = Math.max(0, Math.min(touch.clientX - rect.left, rect.width));
+        const progress = x / rect.width;
+        setPlayheadPosition(x);
+        const newTime = progress * duration;
+        setCurrentTime(newTime);
+        if (hasAudio && audioRef.current) {
+          audioRef.current.currentTime = newTime;
+        }
+      }
+    }
+  };
+
   const handleReset = () => {
     setIsPlaying(false);
     setCurrentTime(0);
@@ -307,7 +364,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
   return (
     <div
       id="waveform-viewer"
-      className="glass-card-elevated hover:-translate-y-1 group p-5 sm:p-6 relative overflow-hidden h-full flex flex-col"
+      className="glass-card-elevated group p-5 sm:p-6 relative overflow-hidden h-full flex flex-col"
     >
       {/* Scanning overlay */}
         {isAnalyzing && (
@@ -326,7 +383,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-primary-muted flex items-center justify-center">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-primary">
@@ -356,16 +413,20 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
         <div ref={containerRef} className="relative h-24 sm:h-32 mb-4 cursor-pointer rounded-xl overflow-hidden bg-surface/50">
           <canvas 
             ref={canvasRef} 
-            className="w-full h-full cursor-ew-resize" 
+            className="w-full h-full cursor-ew-resize touch-none" 
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUpOrLeave}
             onMouseLeave={handleMouseUpOrLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
           />
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5">
             {/* Play/Pause */}
             <button
@@ -401,7 +462,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
 
             {/* Volume */}
             {hasAudio && (
-              <div className="flex items-center gap-2 ml-2 select-none">
+              <div className="flex items-center gap-1.5 ml-1 select-none">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="text-text-muted flex-shrink-0">
                   <path d="M2 5.5h2l3-3v11l-3-3H2a1 1 0 01-1-1v-3a1 1 0 011-1z" fill="currentColor" />
                   {volume > 0.3 && <path d="M10.5 4.5a4 4 0 010 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />}
@@ -414,7 +475,7 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
                   step="0.05"
                   value={volume}
                   onChange={handleVolumeChange}
-                  className="w-16 h-1 rounded-full appearance-none bg-surface-elevated cursor-pointer focus:outline-none focus:ring-0 text-transparent caret-transparent
+                  className="w-14 sm:w-16 h-1 rounded-full appearance-none bg-surface-elevated cursor-pointer focus:outline-none focus:ring-0 text-transparent caret-transparent
                     [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 
                     [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer
                     [&::-webkit-slider-thumb]:shadow-[0_0_6px_rgba(56,189,248,0.4)]
@@ -428,14 +489,14 @@ export default function WaveformViewer({ data, audioUrl, isAnalyzing = false }: 
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-text-muted mono-data">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-text-muted mono-data">
             {hasAudio ? (
               <span className="px-2 py-0.5 rounded-md bg-accent-muted border border-accent/20 text-accent">AUDIO</span>
             ) : (
               <span className="px-2 py-0.5 rounded-md bg-surface border border-border">MOCK</span>
             )}
             <span className="px-2 py-0.5 rounded-md bg-surface border border-border">STEREO</span>
-            <span className="px-2 py-0.5 rounded-md bg-surface border border-border">16-BIT</span>
+            <span className="hidden xs:inline sm:inline px-2 py-0.5 rounded-md bg-surface border border-border">16-BIT</span>
           </div>
         </div>
     </div>

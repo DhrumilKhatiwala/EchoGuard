@@ -10,7 +10,7 @@ export default function EvidenceSummary({ forensics }: EvidenceSummaryProps) {
   const { characteristics, advanced } = forensics;
 
   return (
-    <div className="glass-card-elevated hover:-translate-y-1 group p-5 sm:p-6 h-full flex flex-col">
+    <div className="glass-card-elevated group p-5 sm:p-6 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-6">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-primary">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -63,7 +63,7 @@ export default function EvidenceSummary({ forensics }: EvidenceSummaryProps) {
 
         {showAdvanced && (
           <div className="mt-4 p-4 rounded-xl bg-surface-elevated/50 border border-border/50 animate-in fade-in slide-in-from-top-2">
-            <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4">
               {Object.entries(advanced).map(([key, value]) => (
                 <div key={key}>
                   <div className="text-xs text-text-muted uppercase tracking-wider mb-1">{key}</div>

@@ -11,8 +11,8 @@ export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps)
   ];
 
   return (
-    <div className="glass-card-elevated hover:-translate-y-1 group p-5 sm:p-6 h-full flex flex-col relative">
-      <div className="flex items-center justify-between mb-6">
+    <div className="glass-card-elevated group p-5 sm:p-6 h-full flex flex-col relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-primary">
             <path d="M12 20V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -23,7 +23,7 @@ export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps)
         </div>
         
         <div 
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-border/60 text-xs font-medium text-text-secondary cursor-help transition-colors hover:border-primary/50"
+          className="self-start sm:self-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-border/60 text-xs font-medium text-text-secondary cursor-help transition-colors hover:border-primary/50"
           title="These metrics are generated from signal-processing analysis and are independent of the deepfake detector's prediction."
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/70">

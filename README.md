@@ -6,7 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Deep Learning](https://img.shields.io/badge/Deep_Learning-Wav2Vec2_Ensemble-orange?style=for-the-badge)](https://huggingface.co/)
 
-_An end-to-end deep learning platform to identify synthetic voices with high precision._
+_An advanced AI platform for detection of synthetic speech and voice cloning._
 
 <br />
 
@@ -98,20 +98,20 @@ graph TB
 
 ### Technology Stack
 
-| Layer | Framework/Language | Key Features & Components |
-| :--- | :--- | :--- |
+| Layer        | Framework/Language               | Key Features & Components                                                            |
+| :----------- | :------------------------------- | :----------------------------------------------------------------------------------- |
 | **Frontend** | Next.js 15, TypeScript, Tailwind | Interactive glassmorphic UI, Audio Uploader, Waveform Canvas, Timeline Visualization |
-| **Backend** | FastAPI, Python 3.11 | High-performance REST architecture, in-memory caching, parallel processing |
+| **Backend**  | FastAPI, Python 3.11             | High-performance REST architecture, in-memory caching, parallel processing           |
 
 ### Deep Learning Pipeline (Deepfake Detection)
 
 - **Architecture Strategy**: Dual-Model Ensemble Strategy utilizing Max-pooling to guarantee the highest detection sensitivity.
 - **Timeline Analysis**: Audio is processed in exact 1-second chunks through the ensemble to produce a visual, time-mapped array of deepfake artifacts.
 
-| Designation | Transformer Architecture | Primary Detection Domain |
-| :--- | :--- | :--- |
-| **Primary Model** | [garystafford/wav2vec2-deepfake-voice-detector](https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector) | General Synthetic Audio & AI Voice Clones |
-| **Secondary Model**| [Bisher/wav2vec2_ASV_deepfake_audio_detection](https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection) | High-Fidelity TTS Engines (e.g. ElevenLabs) |
+| Designation         | Transformer Architecture                                                                                              | Primary Detection Domain                    |
+| :------------------ | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------------ |
+| **Primary Model**   | [garystafford/wav2vec2-deepfake-voice-detector](https://huggingface.co/garystafford/wav2vec2-deepfake-voice-detector) | General Synthetic Audio & AI Voice Clones   |
+| **Secondary Model** | [Bisher/wav2vec2_ASV_deepfake_audio_detection](https://huggingface.co/Bisher/wav2vec2_ASV_deepfake_audio_detection)   | High-Fidelity TTS Engines (e.g. ElevenLabs) |
 
 ### Audio Forensics Engine (DSP)
 
@@ -162,12 +162,14 @@ EchoGuard/
 ### Installation & Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/username/echoguard.git
    cd echoguard
    ```
 
 2. **Setup the Backend:**
+
    ```bash
    cd backend
    pip install -r requirements.txt
@@ -175,6 +177,7 @@ EchoGuard/
    ```
 
 3. **Setup the Frontend:**
+
    ```bash
    cd ../frontend
    npm install

@@ -15,7 +15,7 @@ export default function TimelineAnalysis({ segments, durationSeconds }: Timeline
   };
 
   return (
-    <div className="glass-card-elevated hover:-translate-y-1 group p-5 sm:p-6 h-full flex flex-col">
+    <div className="glass-card-elevated group p-5 sm:p-6 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-6">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-primary">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
@@ -66,7 +66,7 @@ export default function TimelineAnalysis({ segments, durationSeconds }: Timeline
       </div>
       
       {/* Legend */}
-      <div className="flex items-center gap-6 mt-4 text-sm text-text-muted mono-data">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 text-sm text-text-muted mono-data">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-accent/80" />
           <span>Human-like</span>

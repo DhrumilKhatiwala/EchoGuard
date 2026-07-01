@@ -29,6 +29,9 @@ export const metadata: Metadata = {
   description:
     "Detect deepfake audio in seconds with military-grade AI analysis. Upload, analyze, and verify voice authenticity with EchoGuard's advanced detection engine.",
   keywords: ["deepfake detection", "audio analysis", "AI security", "voice verification"],
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

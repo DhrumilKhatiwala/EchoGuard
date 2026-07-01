@@ -72,14 +72,14 @@ export default function BenchmarkSection() {
                     <span className={isWinner ? 'text-primary' : 'text-text-secondary'}>{modelName.split('/').pop()}</span>
                     {isWinner && <span className="px-2 py-0.5 rounded text-xs bg-primary/20 text-primary tracking-widest uppercase">Production Model</span>}
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 divide-x divide-border/30">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                     {[
                       { label: "Accuracy", value: metrics.accuracy },
                       { label: "Precision", value: metrics.precision },
                       { label: "Recall", value: metrics.recall },
                       { label: "F1 Score", value: metrics.f1_score }
-                    ].map((metric, i) => (
-                      <div key={metric.label} className={`text-center px-2 ${i === 0 || i === 2 ? "border-l-0" : ""}`}>
+                    ].map((metric) => (
+                      <div key={metric.label} className="text-center p-3 rounded-xl bg-surface/50 border border-border/20">
                         <div className={`text-xl font-bold mb-1 font-mono ${isWinner ? 'text-accent text-glow-primary' : 'text-text-secondary'}`}>
                           {typeof metric.value === 'number' ? `${(metric.value * 100).toFixed(1)}%` : metric.value}
                         </div>

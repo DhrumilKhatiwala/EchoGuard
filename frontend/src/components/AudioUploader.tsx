@@ -10,6 +10,63 @@ interface AudioUploaderProps {
 const ACCEPTED_TYPES = [".wav", ".mp3", ".flac", ".ogg", ".m4a"];
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
+function AudioUploadIcon({ status }: { status: "idle" | "uploading" | "processing" | "complete" | "error" }) {
+  if (status === "uploading") {
+    return (
+      <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-primary animate-bounce">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" opacity="0.5" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (status === "processing") {
+    return (
+      <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-accent animate-spin" style={{ animationDuration: "2s" }}>
+          <circle cx="12" cy="12" r="10" strokeDasharray="16 16" />
+          <path d="M12 8v4l2 2" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (status === "complete") {
+    return (
+      <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+          <circle cx="12" cy="12" r="10" opacity="0.2" fill="currentColor" />
+          <path d="M16 10l-5.5 5.5L8 13" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
+          <circle cx="12" cy="12" r="10" opacity="0.2" fill="currentColor" />
+          <path d="M15 9l-6 6m0-6l6 6" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-12 h-12 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:-translate-y-1">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+      </svg>
+    </div>
+  );
+}
+
 export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const [state, setState] = useState<UploadState>({
     status: "idle",
@@ -202,13 +259,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             {/* Idle State */}
             {state.status === "idle" && (
               <>
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-primary-muted flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/15 transition-all duration-300">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-primary">
-                    <path d="M14 4v14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M8 12l6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M4 22h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </div>
+                <AudioUploadIcon status="idle" />
                 <div>
                   <p className="text-foreground font-medium text-base mb-1">
                     {isDragging ? "Release to upload" : "Drag & drop audio file here"}
@@ -234,13 +285,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             {/* Uploading */}
             {state.status === "uploading" && (
               <div className="space-y-5">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-primary-muted flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-primary animate-pulse">
-                    <path d="M14 4v14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M8 12l6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M4 22h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </div>
+                <AudioUploadIcon status="uploading" />
                 <div>
                   <p className="text-foreground font-medium text-sm">{state.file?.name}</p>
                   <p className="text-text-muted text-sm mt-0.5">
@@ -265,11 +310,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             {/* Processing */}
             {state.status === "processing" && (
               <div className="space-y-5">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-accent-muted flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-accent animate-spin" style={{ animationDuration: "2s" }}>
-                    <circle cx="14" cy="14" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="50 15" />
-                  </svg>
-                </div>
+                <AudioUploadIcon status="processing" />
                 <p className="text-foreground font-medium text-sm">Processing audio...</p>
                 <p className="text-text-muted text-sm mono-data animate-pulse-glow">
                   Extracting features → Analyzing patterns
@@ -280,12 +321,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             {/* Complete */}
             {state.status === "complete" && (
               <div className="space-y-5">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-accent-muted flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-accent">
-                    <path d="M9 14l3.5 3.5L19 10.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="14" cy="14" r="10" stroke="currentColor" strokeWidth="1.5" />
-                  </svg>
-                </div>
+                <AudioUploadIcon status="complete" />
                 <div>
                   <p className="text-accent font-medium text-sm">Upload Complete</p>
                   <p className="text-text-muted text-sm mt-0.5">{state.file?.name}</p>
@@ -307,12 +343,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
             {/* Error */}
             {state.status === "error" && (
               <div className="space-y-5">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-danger-muted flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" className="text-danger">
-                    <path d="M10 10l8 8M18 10l-8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                    <circle cx="14" cy="14" r="10" stroke="currentColor" strokeWidth="1.5" />
-                  </svg>
-                </div>
+                <AudioUploadIcon status="error" />
                 <div>
                   <p className="text-danger font-medium text-sm">Upload Error</p>
                   <p className="text-text-muted text-sm mt-0.5">{state.error}</p>
