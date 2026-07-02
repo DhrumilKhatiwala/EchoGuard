@@ -109,6 +109,15 @@ const getConfidenceLevel = (confidence: number) => {
   return { text: "Low", color: "text-danger" };
 };
 
+const formatTimeDisplay = (timeStr?: string) => {
+  if (!timeStr || !timeStr.includes(":")) return timeStr || "";
+  const parts = timeStr.split(":");
+  if (parts.length === 2 && parts[0].length === 1) {
+    return `0${timeStr}`;
+  }
+  return timeStr;
+};
+
 export default function PredictionCard({ result, visible = true }: PredictionCardProps) {
   const config = verdictConfig[result.verdict];
   const [show, setShow] = useState(false);
@@ -213,7 +222,7 @@ export default function PredictionCard({ result, visible = true }: PredictionCar
 
         {/* Footer */}
         <div className="mt-8 pt-4 border-t border-border flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-sm text-text-muted mono-data">
-          <span>{result.duration}</span>
+          <span>{formatTimeDisplay(result.duration)}</span>
           <span className="text-border hidden sm:inline">·</span>
           <span>{result.fileSize}</span>
           <span className="text-border hidden sm:inline">·</span>

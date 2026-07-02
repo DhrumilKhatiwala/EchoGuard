@@ -30,6 +30,15 @@ const verdictStyles: Record<Verdict, { label: string; dotColor: string; textColo
 
 type FilterType = "all" | Verdict;
 
+const formatTimeDisplay = (timeStr?: string) => {
+  if (!timeStr || !timeStr.includes(":")) return timeStr || "";
+  const parts = timeStr.split(":");
+  if (parts.length === 2 && parts[0].length === 1) {
+    return `0${timeStr}`;
+  }
+  return timeStr;
+};
+
 export default function AnalysisHistory({ items }: AnalysisHistoryProps) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -137,7 +146,7 @@ export default function AnalysisHistory({ items }: AnalysisHistoryProps) {
                       {item.filename}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 text-sm text-text-muted mono-data">
-                      <span>{item.duration}</span>
+                      <span>{formatTimeDisplay(item.duration)}</span>
                       <span className="text-border">·</span>
                       <span>{item.fileSize}</span>
                       <span className="hidden sm:inline text-border">·</span>
@@ -174,7 +183,7 @@ export default function AnalysisHistory({ items }: AnalysisHistoryProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
                       {[
                         { label: "Confidence", value: `${(item.confidence * 100).toFixed(1)}%`, highlight: true },
-                        { label: "Duration", value: item.duration },
+                        { label: "Duration", value: formatTimeDisplay(item.duration) },
                         { label: "Date", value: new Date(item.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) },
                       ].map((field) => (
                         <div key={field.label}>

@@ -113,16 +113,6 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 text-center">
-        {/* Status badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-border glass-card mb-10 animate-float">
-          <span className="relative flex h-[6px] w-[6px]">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60" />
-            <span className="relative inline-flex rounded-full h-[6px] w-[6px] bg-accent" />
-          </span>
-          <span className="text-sm font-medium text-accent tracking-wide uppercase">
-            AI Detection Engine Active
-          </span>
-        </div>
 
         {/* Headline */}
         <h1 className="heading-xl text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6">
