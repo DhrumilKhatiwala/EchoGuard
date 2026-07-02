@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from app.config import settings
-from app.routers import analysis, stats
+from app.routers import analysis
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,6 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 
 app.include_router(analysis.router, prefix="/api")
-app.include_router(stats.router, prefix="/api")
 
 @app.get(
     "/",

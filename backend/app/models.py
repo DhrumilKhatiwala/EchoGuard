@@ -1,7 +1,7 @@
 """Pydantic models for API request/response schemas."""
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 from enum import Enum
 
 
@@ -11,9 +11,14 @@ class PredictionLabel(str, Enum):
     HUMAN = "Human"
     UNCERTAIN = "Uncertain"
 
+class MetricDetail(BaseModel):
+    score: int
+    confidence: str
+    reason: str
+
 class ForensicMetrics(BaseModel):
-    voice_naturalness: int
-    audio_quality: int
+    voice_naturalness: Union[int, MetricDetail]
+    audio_quality: Union[int, MetricDetail]
     characteristics: List[str]
     advanced: Dict[str, str]
 

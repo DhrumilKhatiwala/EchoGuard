@@ -6,8 +6,8 @@ interface ForensicsDashboardProps {
 
 export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps) {
   const metricItems = [
-    { label: "Voice Naturalness", value: metrics.voice_naturalness, desc: "Measures how naturally the voice changes while speaking." },
-    { label: "Audio Quality", value: metrics.audio_quality, desc: "Measures clarity and consistency of the recording." }
+    { label: "Voice Naturalness", value: metrics.voice_naturalness, desc: "How realistic and human-like the voice sounds." },
+    { label: "Audio Quality", value: metrics.audio_quality, desc: "How clear and clean the microphone recording is." }
   ];
 
   return (
@@ -35,29 +35,35 @@ export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps)
       </div>
       
       <div className="space-y-6">
-        {metricItems.map((metric) => (
-          <div key={metric.label}>
-            <div className="flex items-baseline justify-between mb-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-base font-medium text-foreground">{metric.label}</span>
-                <span className="text-sm text-text-muted hidden sm:inline">{metric.desc}</span>
+        {metricItems.map((metric) => {
+          const isObj = typeof metric.value === "object" && metric.value !== null;
+          const scoreValue = isObj ? (metric.value as any).score : (metric.value as number);
+          const reasonText = isObj ? (metric.value as any).reason : metric.desc;
+
+          return (
+            <div key={metric.label}>
+              <div className="flex items-baseline justify-between mb-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-base font-medium text-foreground">{metric.label}</span>
+                  <span className="text-sm text-text-muted hidden sm:inline">{reasonText}</span>
+                </div>
+                <span className="text-base mono-data font-medium" 
+                      style={{ color: scoreValue > 75 ? "#34d399" : scoreValue > 50 ? "#fbbf24" : "#f43f5e" }}>
+                  {scoreValue}%
+                </span>
               </div>
-              <span className="text-base mono-data font-medium" 
-                    style={{ color: metric.value > 75 ? "#34d399" : metric.value > 50 ? "#fbbf24" : "#f43f5e" }}>
-                {metric.value}%
-              </span>
+              <div className="h-2 bg-surface rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-[1200ms] ease-out"
+                  style={{
+                    width: `${scoreValue}%`,
+                    background: `linear-gradient(90deg, #38bdf8, ${scoreValue > 75 ? "#34d399" : scoreValue > 50 ? "#fbbf24" : "#f43f5e"})`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-2 bg-surface rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-[1200ms] ease-out"
-                style={{
-                  width: `${metric.value}%`,
-                  background: `linear-gradient(90deg, #38bdf8, ${metric.value > 75 ? "#34d399" : metric.value > 50 ? "#fbbf24" : "#f43f5e"})`,
-                }}
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -2,9 +2,15 @@ export type Verdict = 'authentic' | 'deepfake' | 'suspicious';
 
 export type UploadStatus = 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
 
+export interface MetricDetail {
+  score: number;
+  confidence: "High" | "Medium" | "Low";
+  reason: string;
+}
+
 export interface ForensicMetrics {
-  voice_naturalness: number;
-  audio_quality: number;
+  voice_naturalness: number | MetricDetail;
+  audio_quality: number | MetricDetail;
   characteristics: string[];
   advanced: Record<string, string>;
 }

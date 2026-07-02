@@ -294,7 +294,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
                 </div>
                 <div className="max-w-xs mx-auto">
                   <div className="flex justify-between text-sm text-text-secondary mb-2">
-                    <span className="mono-data tracking-wider uppercase">Uploading</span>
+                    <span className="font-medium text-foreground">Uploading...</span>
                     <span className="mono-data text-primary">{Math.round(state.progress)}%</span>
                   </div>
                   <div className="h-1.5 bg-surface rounded-full overflow-hidden">
@@ -312,9 +312,14 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
               <div className="space-y-5">
                 <AudioUploadIcon status="processing" />
                 <p className="text-foreground font-medium text-sm">Processing audio...</p>
-                <p className="text-text-muted text-sm mono-data animate-pulse-glow">
-                  Extracting features → Analyzing patterns
-                </p>
+                <div className="flex items-center justify-center gap-2 text-xs font-medium text-primary animate-pulse-glow">
+                  <div className="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <span>Extracting features &amp; analyzing patterns...</span>
+                </div>
               </div>
             )}
 

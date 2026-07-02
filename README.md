@@ -46,6 +46,44 @@ EchoGuard is a powerful deepfake audio detection platform designed to protect ag
 
 ## System Architecture
 
+### Dual-Pipeline Design
+
+```text
+┌──────────────────────────────────────────────────────┐
+│                    Input Audio                        │
+└─────────────────────┬────────────────────────────────┘
+                      │
+          ┌───────────┴───────────┐
+          │                       │
+          ▼                       ▼
+┌─────────────────┐     ┌─────────────────────┐
+│   Pipeline 1    │     │     Pipeline 2       │
+│  Deep Learning  │     │   Audio Forensics    │
+│    Detector     │     │    (DSP Engine)      │
+│                 │     │                      │
+│   Wav2Vec2      │     │  Signal Processing   │
+│   Ensemble      │     │  (librosa)           │
+│                 │     │                      │
+│  ┌───────────┐  │     │  ┌────────────────┐  │
+│  │ Human /   │  │     │  │ Voice          │  │
+│  │ AI Prob.  │  │     │  │ Naturalness    │  │
+│  └───────────┘  │     │  ├────────────────┤  │
+│                 │     │  │ Audio Quality  │  │
+│                 │     │  ├────────────────┤  │
+│                 │     │  │ Detected       │  │
+│                 │     │  │ Characteristics│  │
+│                 │     │  └────────────────┘  │
+└─────────────────┘     └─────────────────────┘
+          │                       │
+          └───────────┬───────────┘
+                      │
+                      ▼
+            ┌─────────────────┐
+            │    Frontend     │
+            │  (Combined UI)  │
+            └─────────────────┘
+```
+
 ### System Overview
 
 ```mermaid
@@ -115,11 +153,12 @@ graph TB
 
 ### Audio Forensics Engine (DSP)
 
-The forensic layer relies strictly on mathematical signal processing (via `librosa`) to ensure independent, ground-truth evidence completely isolated from the neural networks.
+The forensic layer is a **completely independent** signal processing engine. It evaluates audio strictly from the raw waveform using `librosa` — it has zero access to the deep learning prediction and will never adjust its scores based on whether the AI classifier thinks the audio is real or fake.
 
-- **Voice Naturalness**: Evaluates pitch standard deviation (`yin`) on voiced frames and pause-to-speech ratios via RMS energy thresholding.
-- **Audio Quality**: Computes spectral centroids, spectral bandwidth, and square-root normalized variance of zero-crossing rates.
-- **Multi-Window Analysis**: Automatically extracts distinct 5-second representative windows to prevent musical intros from corrupting the metrics.
+- **Voice Naturalness**: Measures how realistic the voice sounds — evaluates pitch variation (`yin` on voiced frames), pitch range (10th–90th percentile), and pause-to-speech ratios via adaptive RMS energy thresholding (20th percentile baseline).
+- **Audio Quality**: Measures recording clarity — computes spectral centroids, spectral bandwidth, RMS consistency, and zero-crossing rate consistency using Gaussian and square-root normalization.
+- **Multi-Window Analysis**: Automatically extracts distinct 5-second representative windows to prevent musical intros or silence from corrupting the metrics.
+- **Natural Scoring**: Scores span the full 0–100 range based on measured characteristics. No artificial clamping — a clean recording of a human voice can score 85, and so can a high-quality AI-generated voice.
 
 ### Data Flow
 
@@ -127,7 +166,7 @@ The forensic layer relies strictly on mathematical signal processing (via `libro
 2. **Pre-processing**: FastAPI downsamples the audio to `16kHz mono`, normalizes the amplitude, and renders Mel Spectrograms.
 3. **Execution**: The audio is batched into 1-second segments and passed simultaneously through the DL Ensemble and the independent DSP engine.
 4. **Synchronization**: The resulting combined payload (Detection Verdict, Timeline Array, Forensic Evidence) is generated and returned.
-5. **Visualization**: The UI instantly renders the Waveform, Timeline Analysis, and Confidence Dashboards.
+5. **Visualization**: The UI renders the Prediction, Waveform, Forensics Dashboard, Detected Characteristics, Timeline, and Analysis History with a smooth sequential reveal.
 
 ---
 
@@ -137,7 +176,7 @@ The forensic layer relies strictly on mathematical signal processing (via `libro
 EchoGuard/
 ├── backend/                    # FastAPI Backend
 │   ├── app/                    # Core API, Models, and Services
-│   │   ├── services/           # DL Detector and Forensics Engines
+│   │   ├── services/           # DL Detector and DSP Forensics Engine
 │   │   └── routers/            # API Endpoints
 │   └── requirements.txt        # Python dependencies
 ├── frontend/                   # Next.js 15 Frontend
@@ -145,7 +184,7 @@ EchoGuard/
 │   │   ├── app/                # React App Router pages
 │   │   └── components/         # Interactive UI components
 │   └── package.json            # Node.js dependencies
-├── docs/                       # Architecture diagrams and documentation
+├── docs/                       # Demo video and documentation
 ├── .gitignore                  # Defines ignored files and directories
 └── README.md                   # Project documentation
 ```
@@ -164,8 +203,8 @@ EchoGuard/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/username/echoguard.git
-   cd echoguard
+   git clone https://github.com/DhrumilKhatiwala/EchoGuard.git
+   cd EchoGuard
    ```
 
 2. **Setup the Backend:**

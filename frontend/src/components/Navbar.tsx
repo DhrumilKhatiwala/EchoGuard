@@ -286,10 +286,6 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <div className="pt-2 border-t border-primary/10 px-4 py-2 flex items-center justify-between">
-            <span className="text-xs text-text-muted font-medium">API Health</span>
-            {getStatusBadge(true)}
-          </div>
         </div>
       </div>
     </nav>

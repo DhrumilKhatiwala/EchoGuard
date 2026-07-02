@@ -8,10 +8,10 @@ interface LoadingStateProps {
 }
 
 const steps = [
-  { label: "Initializing Analysis", icon: "⟳" },
-  { label: "Extracting Features", icon: "◎" },
-  { label: "Analyzing Patterns", icon: "◇" },
-  { label: "Generating Report", icon: "◈" },
+  { label: "Initializing Analysis" },
+  { label: "Extracting Features" },
+  { label: "Analyzing Patterns" },
+  { label: "Generating Report" },
 ];
 
 export default function LoadingState({ isLoading, variant = "inline" }: LoadingStateProps) {
@@ -66,18 +66,30 @@ export default function LoadingState({ isLoading, variant = "inline" }: LoadingS
         {steps.map((step, index) => (
           <div
             key={step.label}
-            className={`flex items-center justify-center gap-2.5 text-base transition-all duration-500 ${
+            className={`flex items-center justify-center gap-2.5 text-sm sm:text-base transition-all duration-500 py-1 ${
               index < currentStep
-                ? "text-accent"
+                ? "text-foreground"
                 : index === currentStep
-                ? "text-primary"
-                : "text-text-muted"
+                ? "text-foreground font-semibold scale-[1.02]"
+                : "text-text-muted opacity-60"
             }`}
           >
-            <span className="w-4 text-center text-sm">
-              {index < currentStep ? "✓" : index === currentStep ? step.icon : "○"}
-            </span>
-            <span className={`mono-data ${index === currentStep ? "animate-pulse-glow" : ""}`}>
+            {index < currentStep ? (
+              <div className="w-5 h-5 rounded-full bg-accent/20 text-accent flex items-center justify-center flex-shrink-0 shadow-inner">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            ) : index === currentStep ? (
+              <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center flex-shrink-0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" strokeLinecap="round" />
+                </svg>
+              </div>
+            ) : (
+              <div className="w-5 h-5 rounded-full border-2 border-border/60 flex-shrink-0" />
+            )}
+            <span className={`font-medium tracking-wide ${index === currentStep ? "text-primary text-glow-primary" : ""}`}>
               {step.label}
               {index === currentStep ? dots : ""}
             </span>
