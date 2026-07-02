@@ -97,7 +97,7 @@ export default function Navbar() {
         } else {
           handleOfflineOrWaking();
         }
-      } catch (err) {
+      } catch {
         if (!isMounted) return;
         handleOfflineOrWaking();
       }

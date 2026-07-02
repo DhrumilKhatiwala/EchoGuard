@@ -166,7 +166,7 @@ export default function AudioUploader({ onUploadComplete }: AudioUploaderProps) 
       const blob = await response.blob();
       const file = new File([blob], fileName, { type: 'audio/wav' });
       handleFile(file);
-    } catch (err) {
+    } catch {
       setState({ status: "error", progress: 0, file: null, error: "Failed to load sample audio." });
     }
   };

@@ -1,4 +1,4 @@
-import { ForensicMetrics } from "@/lib/types";
+import { ForensicMetrics, MetricDetail } from "@/lib/types";
 
 interface ForensicsDashboardProps {
   metrics: ForensicMetrics;
@@ -13,32 +13,27 @@ export default function ForensicsDashboard({ metrics }: ForensicsDashboardProps)
   return (
     <div className="glass-card-elevated group p-5 sm:p-6 h-full flex flex-col relative">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div className="flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-primary">
-            <path d="M12 20V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M18 20V4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M6 20v-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <h3 className="text-base font-semibold heading-md text-foreground">Forensics Dashboard</h3>
-        </div>
-        
-        <div 
-          className="self-start sm:self-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface border border-border/60 text-xs font-medium text-text-secondary cursor-help transition-colors hover:border-primary/50"
-          title="These metrics are generated from signal-processing analysis and are independent of the deepfake detector's prediction."
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/70">
-            <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-            <polyline points="9 12 11 14 15 10" />
-          </svg>
-          Independent Audio Analysis
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center border border-accent/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
+              <path d="M12 2a10 10 0 0 1 10 10" className="animate-pulse" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+              Forensics Dashboard
+            </h3>
+            <p className="text-xs text-text-muted">Pure signal processing evaluation (DSP)</p>
+          </div>
         </div>
       </div>
       
       <div className="space-y-6">
         {metricItems.map((metric) => {
           const isObj = typeof metric.value === "object" && metric.value !== null;
-          const scoreValue = isObj ? (metric.value as any).score : (metric.value as number);
-          const reasonText = isObj ? (metric.value as any).reason : metric.desc;
+          const scoreValue = isObj ? (metric.value as MetricDetail).score : (metric.value as number);
+          const reasonText = isObj ? (metric.value as MetricDetail).reason : metric.desc;
 
           return (
             <div key={metric.label}>
